@@ -1,0 +1,74 @@
+{% extends 'base.html' %} {% block title %}Home{% endblock title %} 
+{% load discount_cal %} {% block content %} 
+
+ {% if err_message %}
+
+<div class="modal" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" style="display: block;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h3>{{err_message}}</h3>
+            </div>
+
+            <div class="modal-footer">
+                <form action="{% url 'home' %}" method = "post">
+                    {% csrf_token %}
+                <button type="submit" class="btn btn-danger" data-bs-dismiss="modal">Ok</button>
+            </form>
+
+            </div>
+        </div>
+    </div>
+</div> 
+{% else %}
+
+<div class="container my-3">
+    <div class="row">
+        {% for course in course_info %}
+        
+        <div class="col">
+            <div class="card mx-auto" style="width: 18rem;">
+                <img src=" {{course.image.url}}" class="card-img-top" alt="..." height=200>
+                <div class="card-body">
+
+                    <h5 class="card-title">{{course.name}}</h5>
+                    <p class="card-text">{{course.discount}}%
+                        <br>
+                        <del>  Rs.{{course.price}}</del>
+                        <h3>Rs.{% fnl_discount course.price course.discount %}</h3>
+
+                    </p>
+                </div>
+                <div class="card-footer p-0">
+                    {% is_enroll request course as enrolled %}
+                    <div class="row no-gutters">
+                      
+                            {% if enrolled %}
+                           <div class="col border-right">
+                                <a href="course/{{course.slug}}" class="btn btn-primary btn-block mystyle">Start Course</a>
+                            </div>
+                            {% else %}
+                             <div class="col border-right">
+                                <a href="checkout/{{course.slug}}" class="btn btn-primary btn-block mystyle ">Enroll Now</a>
+                            </div>
+                              
+                        <div class="col border-right"> 
+                            <a href="course/{{course.slug}} " class="btn btn-primary btn-block mystyle"> More</a>
+                        </div>
+                        {% endif %}
+                        
+                    </div>
+              </div>
+            </div>
+
+            
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+ {% endblock content %}

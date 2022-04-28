@@ -1,0 +1,180 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <script src = "{% static 'js/script.js' %}"></script>
+
+    <title>{% block title %}{% endblock title %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  </head>
+  <body>
+
+    <div class = "container my-3">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">CPoint</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a>
+        </li>
+        {% comment %} <li class="nav-item">
+          <a class="nav-link" href="#">Link</a>
+        </li> {% endcomment %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Courses
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+             {% for courseName,courseSlug  in  request.session.course_list.items %}
+            <li><a class="dropdown-item" href="/{{courseSlug}}">{{courseName}}</a></li>
+            {% endfor %}  
+          </ul>
+        </li>
+        {% if request.session.name %}
+         <li class="nav-item">
+          <a class="nav-link btn-success rounded mx-3" href="#">{{request.session.name}}</a>
+          
+        </li> 
+        <li class="nav-item">
+          <a class="nav-link btn-success rounded" href="{% url 'my_course' %}">My Learning</a>
+        </li> 
+        {% else %}
+        <li class="nav-item">
+          <a class="nav-link" href="#">Link</a>
+        </li> 
+        {% endif %}
+        
+       
+         
+       
+      </ul>
+      
+      <form class="d-flex">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+       
+      </form>
+      {% if request.session.name %}
+      <form action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+       <button class="btn btn-primary mx-3" >Logout</button>
+       </form>
+        
+        {% else %}
+         <button class="btn btn-primary mx-3" data-bs-target = "#login" data-bs-toggle = "modal">Login</button>
+        <button type = "button" class="btn btn-primary" data-bs-target = "#signup" data-bs-toggle = "modal">SignUp</button>
+      {% endif %}
+      
+    </div>
+  </div>
+</nav>
+
+{% comment %} THis MOdal is for signup {% endcomment %}
+
+
+<!-- Modal -->
+<div class="modal fade" id="signup" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Registration</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form class="row g-3" action = "{% url 'signup' %}" method = "post">
+            {% csrf_token %}
+  <div class="col-md-6">
+    <label for="name" class="form-label">First Name</label>
+    <input type="text" class="form-control" id="name" name = "fname">
+  </div>
+  <div class="col-md-6">
+    <label for="lname" class="form-label">Last Name</label>
+    <input type="text" class="form-control" id="lname" name = "lname">
+  </div>
+  <div class="col-6">
+    <label for="email" class="form-label">Email</label>
+    <input type="email" class="form-control" id="email" name = "email">
+  </div>
+  <div class="col-6">
+    <label for="password" class="form-label">Password</label>
+    <input type="password" class="form-control" id="password" name = "password">
+  </div>
+  <div class="col-md-6">
+    <label for="mobile" class="form-label">Mobile</label>
+    <input type="number" class="form-control" id="mobile" name = "mobile">
+  </div>
+  
+  <div class="col-md-6">
+    <label for="Gender" class="form-label">Gender</label>
+    <br>
+    <input type="radio"  id="gender" class ="mx-3"name = "gender" value = "male">Male
+    <input type="radio"  id="gender"class ="mx-3" name = "gender" value = "female">Female
+  </div>
+  
+  <div class="col-12">
+    <button type="submit" class="btn btn-primary">Sign Up</button>
+  </div>
+</form>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+{% comment %} This modal is for login {% endcomment %}
+
+
+<div class="modal fade" id="login" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Login</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+       <form action="{% url 'login' %}" method = "post" name="myform" onsubmit="return validateform()">
+           {% csrf_token %}
+        <div class="row">
+  <div class="col-12">
+     <h5 id ="valid"></h5>
+    <input type="email" class="form-control my-2" id = "email" name = "email" placeholder="Email" >
+  </div>
+  <div class="col">
+    <input type="password" class="form-control  my-2" name = "password" placeholder="password" >
+  </div>
+</div>
+ <div class="col-12">
+    <button type="submit" class="btn btn-primary my-2" >Sign In</button>
+  </div>
+</form>
+      
+    </div>
+  </div>
+</div>
+
+ 
+  </div>
+    {% block content %}{% endblock content %}
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+    <!-- Option 2: Separate Popper and Bootstrap JS -->
+    <!--
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+    -->
+
+  </body>
+</html>
